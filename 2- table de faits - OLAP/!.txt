@@ -1,0 +1,5 @@
+totalQuantite : quantite totale d'un produit dans toutes le commande dans une durée
+CA : chiffre d'affaire (revenu) du à la vente d'un produit dan sune durée
+NbLivShipper : le nombre de livraison de commande d'un livreur dans une durée (performance livreur)
+NbVentesEmploye : le nombre de commande (orders) réalisées par un employé (performance employe)
+ClFid : le nombre de client ayant effectuer le plus grand nombre de commandes (fidelite)
