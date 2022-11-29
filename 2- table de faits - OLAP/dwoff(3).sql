@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 25 nov. 2022 à 21:43
+-- Généré le : mar. 29 nov. 2022 à 20:19
 -- Version du serveur : 10.4.24-MariaDB
 -- Version de PHP : 8.1.6
 
@@ -36,17 +36,37 @@ CREATE TABLE `categories` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `city`
+--
+
+CREATE TABLE `city` (
+  `city_id` int(11) NOT NULL,
+  `city_name` varchar(50) NOT NULL,
+  `country_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `country`
+--
+
+CREATE TABLE `country` (
+  `country_id` int(11) NOT NULL,
+  `country_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `customers`
 --
 
 CREATE TABLE `customers` (
   `CustomerID` int(11) NOT NULL,
   `CustomerName` varchar(255) DEFAULT NULL,
-  `ContactName` varchar(255) DEFAULT NULL,
-  `Address` varchar(255) DEFAULT NULL,
-  `City` varchar(255) DEFAULT NULL,
-  `PostalCode` varchar(255) DEFAULT NULL,
-  `Country` varchar(255) DEFAULT NULL
+  `gender` varchar(10) NOT NULL,
+  `birthdate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -61,7 +81,20 @@ CREATE TABLE `employees` (
   `FirstName` varchar(255) DEFAULT NULL,
   `BirthDate` date DEFAULT NULL,
   `gender` varchar(255) DEFAULT NULL,
-  `Notes` text DEFAULT NULL
+  `salary` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `geographie`
+--
+
+CREATE TABLE `geographie` (
+  `adresse_id` int(11) NOT NULL,
+  `adresse` varchar(255) NOT NULL,
+  `postal_code` int(11) NOT NULL,
+  `city_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -75,10 +108,15 @@ CREATE TABLE `order_fact` (
   `ProductID` int(11) NOT NULL,
   `EmployeeID` int(11) NOT NULL,
   `ShipperID` int(11) NOT NULL,
-  `temps_id` int(11) NOT NULL,
-  `totalQuantity` int(11) DEFAULT NULL,
-  `CA` double DEFAULT NULL,
-  `profit` double DEFAULT NULL
+  `temps_id` date NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `adresse_id` int(11) NOT NULL,
+  `unit_price` double NOT NULL,
+  `quantite` int(11) NOT NULL,
+  `total_quantite` int(11) NOT NULL,
+  `CA` double NOT NULL,
+  `profit` double NOT NULL,
+  `KPI` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -91,10 +129,7 @@ CREATE TABLE `products` (
   `ProductID` int(11) NOT NULL,
   `ProductName` varchar(255) DEFAULT NULL,
   `SupplierID` int(11) DEFAULT NULL,
-  `CategoryID` int(11) DEFAULT NULL,
-  `Unit` varchar(255) DEFAULT NULL,
-  `PrixVente` double DEFAULT NULL,
-  `PrixAchat` double DEFAULT NULL
+  `CategoryID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -106,8 +141,7 @@ CREATE TABLE `products` (
 CREATE TABLE `shippers` (
   `ShipperID` int(11) NOT NULL,
   `ShipperName` varchar(255) DEFAULT NULL,
-  `Phone` varchar(255) DEFAULT NULL,
-  `PrixLivraison` double DEFAULT NULL
+  `cost` double DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -119,12 +153,7 @@ CREATE TABLE `shippers` (
 CREATE TABLE `suppliers` (
   `SupplierID` int(11) NOT NULL,
   `SupplierName` varchar(255) DEFAULT NULL,
-  `ContactName` varchar(255) DEFAULT NULL,
-  `Address` varchar(255) DEFAULT NULL,
-  `City` varchar(255) DEFAULT NULL,
-  `PostalCode` varchar(255) DEFAULT NULL,
-  `Country` varchar(255) DEFAULT NULL,
-  `Phone` varchar(255) DEFAULT NULL
+  `country` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -134,7 +163,7 @@ CREATE TABLE `suppliers` (
 --
 
 CREATE TABLE `temps_id` (
-  `temps_id` int(11) NOT NULL,
+  `temps_id` date NOT NULL,
   `annee` int(11) NOT NULL,
   `mois` int(11) NOT NULL,
   `jour` int(11) NOT NULL
@@ -151,6 +180,19 @@ ALTER TABLE `categories`
   ADD PRIMARY KEY (`CategoryID`);
 
 --
+-- Index pour la table `city`
+--
+ALTER TABLE `city`
+  ADD PRIMARY KEY (`city_id`),
+  ADD KEY `country_id` (`country_id`);
+
+--
+-- Index pour la table `country`
+--
+ALTER TABLE `country`
+  ADD PRIMARY KEY (`country_id`);
+
+--
 -- Index pour la table `customers`
 --
 ALTER TABLE `customers`
@@ -163,13 +205,21 @@ ALTER TABLE `employees`
   ADD PRIMARY KEY (`EmployeeID`);
 
 --
+-- Index pour la table `geographie`
+--
+ALTER TABLE `geographie`
+  ADD PRIMARY KEY (`adresse_id`),
+  ADD KEY `city_id` (`city_id`);
+
+--
 -- Index pour la table `order_fact`
 --
 ALTER TABLE `order_fact`
-  ADD PRIMARY KEY (`CustomerID`,`ProductID`,`EmployeeID`,`ShipperID`,`temps_id`),
+  ADD PRIMARY KEY (`CustomerID`,`ProductID`,`EmployeeID`,`ShipperID`,`temps_id`,`order_id`,`adresse_id`),
   ADD KEY `EmployeeID` (`EmployeeID`),
   ADD KEY `ProductID` (`ProductID`),
   ADD KEY `ShipperID` (`ShipperID`),
+  ADD KEY `adresse_id` (`adresse_id`),
   ADD KEY `temps_id` (`temps_id`);
 
 --
@@ -239,14 +289,26 @@ ALTER TABLE `suppliers`
   MODIFY `SupplierID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
--- AUTO_INCREMENT pour la table `temps_id`
---
-ALTER TABLE `temps_id`
-  MODIFY `temps_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `city`
+--
+ALTER TABLE `city`
+  ADD CONSTRAINT `city_ibfk_1` FOREIGN KEY (`country_id`) REFERENCES `country` (`country_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `customers`
+--
+ALTER TABLE `customers`
+  ADD CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `order_fact` (`CustomerID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `geographie`
+--
+ALTER TABLE `geographie`
+  ADD CONSTRAINT `geographie_ibfk_1` FOREIGN KEY (`city_id`) REFERENCES `city` (`city_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `order_fact`
@@ -256,7 +318,8 @@ ALTER TABLE `order_fact`
   ADD CONSTRAINT `order_fact_ibfk_2` FOREIGN KEY (`EmployeeID`) REFERENCES `employees` (`EmployeeID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `order_fact_ibfk_3` FOREIGN KEY (`ProductID`) REFERENCES `products` (`ProductID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `order_fact_ibfk_4` FOREIGN KEY (`ShipperID`) REFERENCES `shippers` (`ShipperID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `order_fact_ibfk_5` FOREIGN KEY (`temps_id`) REFERENCES `temps_id` (`temps_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `order_fact_ibfk_6` FOREIGN KEY (`adresse_id`) REFERENCES `geographie` (`adresse_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `order_fact_ibfk_7` FOREIGN KEY (`temps_id`) REFERENCES `temps_id` (`temps_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `products`

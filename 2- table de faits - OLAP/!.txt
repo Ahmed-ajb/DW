@@ -1,7 +1,0 @@
-#fact_order (bach n3erfou chhal kanbi3ou f la quantite ou chhal kandekhlou) 
-totalQuantiteOrder : quantite totale de tous les produits achetés dans une commande
-CAOrder : chiffre d'affaire (revenu) dû à la vente d'une commande
-
-#fact_product (nach n3erfou wach wahed le produits kaytba3 bezzaf donc ghanhefdou 3la le fournisseur dyalou)
-totalQuantiteroduct : quantite totale d'un produit dans une commande
-CAProduct : le chiffre d'affaires dû à la vente de ce nombre de produit de cette commande 
